@@ -1,1 +1,116 @@
+app.js
+import React, { useState } from 'react';
+import {post} from 'post';
+import './App.css';
 
+function App() {
+    const [numbers, setNumbers] = useState('');
+    const [average, setAverage] = useState(null);
+    const [error, setError] = useState(null);
+
+    const handleInputChange = (e) => {
+        setNumbers(e.target.value);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const numberArray = numbers.split(',').map(num => parseFloat(num.trim()));
+
+        try {
+            const response = await axios.post('http://localhost:5000/calculate_average', { numbers: numberArray });
+            setAverage(response.data.average);
+            setError(null);
+        } catch (err) {
+            setError(err.response.data.error);
+            setAverage(null);
+        }
+    };
+
+    return (
+        <div className="App">
+            <header className="App-header">
+                <h1>Average Calculator</h1>
+                <form onSubmit={handleSubmit}>
+                    <input
+                        type="text"
+                        value={numbers}
+                        onChange={handleInputChange}
+                        placeholder="Enter numbers separated by commas"
+                    />
+                    <button type="submit">Calculate Average</button>
+                </form>
+                {average !== null && <p>Average: {average}</p>}
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+            </header>
+        </div>
+    );
+}
+
+export default App;
+
+app.css
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #282c34;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+form {
+  margin: 20px 0;
+}
+
+input {
+  padding: 10px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  margin-right: 10px;
+  width: 300px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #61dafb;
+  color: black;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #21a1f1;
+}
+
+p {
+  font-size: 1.2rem;
+  margin: 10px 0;
+}
+
+p[style='color: red;'] {
+  color: red;
+}
